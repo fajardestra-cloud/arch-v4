@@ -17,7 +17,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "--> [Chroot] Mengatur Network dan Hostname..."
 echo "archlinux" > /etc/hostname
 
-# Menggunakan <<EOT untuk menulis ke /etc/hosts
+# Menggunakan <<EOT untuk menulis ke /etc/hosts (Spasi dibersihkan)
 cat <<EOT > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
@@ -32,6 +32,10 @@ systemctl enable NetworkManager
 
 echo "--> [Chroot] Mengonfigurasi bootloader (systemd-boot)..."
 bootctl install
+
+echo "--> [Chroot] Menghapus mkinitcpio untuk standarisasi Dracut..."
+# Sesuai rekomendasi dokumentasi Arch saat migrasi penuh ke Dracut
+pacman -Rns --noconfirm mkinitcpio || true
 
 echo "--> [Chroot] Membuat initramfs dengan Dracut khusus Zen Kernel..."
 ZEN_VER=$(ls /usr/lib/modules | grep zen)
