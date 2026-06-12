@@ -26,9 +26,9 @@ echo "--> [Chroot] Mengatur Network dan Hostname..."
 echo "archlinux" > /etc/hostname
 
 cat <<EOT > /etc/hosts
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   archlinux.localdomain archlinux
+127.0.0.1 localhost
+::1 localhost
+127.0.1.1 archlinux.localdomain archlinux
 EOT
 
 echo "--> [Chroot] Silakan masukkan Password untuk akun ROOT:"
