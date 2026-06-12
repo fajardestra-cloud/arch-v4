@@ -48,14 +48,14 @@ echo "--> Mengonfigurasi PGP Key dan repositori ALHP v4 pada Live ISO..."
 pacman-key --recv-keys F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
 pacman-key --lsign-key F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
 
-# Modifikasi pacman.conf yang lebih aman untuk ALHP
+# Modifikasi pacman.conf yang aman untuk Live ISO sebelum pacstrap
 sed -i '/^\[core\]/i [core-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
 
 # 6. Optimasi Mirrorlist Resmi Utama
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
 reflector --country Indonesia --protocol https --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
 
-# 7. Eksekusi Pacstrap (Ditambahkan dracut-hook agar otomatisasi Dracut berjalan sempurna)
+# 7. Eksekusi Pacstrap
 echo "--> Menjalankan pacstrap..."
 pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware dracut btrfs-progs nano intel-ucode networkmanager sudo alhp-keyring alhp-mirrorlist
 
