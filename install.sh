@@ -55,7 +55,7 @@ sed -i '/^\[core\]/i [core-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
 reflector --country Indonesia --protocol https --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
 
-# 7. Eksekusi Pacstrap
+# 7. Eksekusi Pacstrap (Ditambahkan dracut-hook agar otomatisasi Dracut berjalan sempurna)
 echo "--> Menjalankan pacstrap..."
 pacstrap -K /mnt base base-devel linux-zen linux-zen-headers linux-firmware dracut btrfs-progs nano intel-ucode networkmanager sudo alhp-keyring alhp-mirrorlist
 
