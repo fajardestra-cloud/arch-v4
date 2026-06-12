@@ -2,7 +2,16 @@
 set -e
 
 echo "--> [Chroot] Mengonfigurasi ALHP v4 secara permanen..."
-sed -i '/^\[core\]/i [core-x86-64-v4]\nInclude = /etc/pacman.d/alhp-mirrorlist\n\n[extra-x86-64-v4]\nInclude = /etc/pacman.d/alhp-mirrorlist\n' /etc/pacman.conf
+# Menggunakan penambahan di akhir file pacman.conf agar jauh lebih aman dari risiko duplikasi terstruktur
+cat <<EOT >> /etc/pacman.conf
+
+[core-x86-64-v4]
+Include = /etc/pacman.d/alhp-mirrorlist
+
+[extra-x86-64-v4]
+Include = /etc/pacman.d/alhp-mirrorlist
+EOT
+
 pacman -Syy --noconfirm
 
 echo "--> [Chroot] Mengatur waktu dan wilayah..."
@@ -17,7 +26,7 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "--> [Chroot] Mengatur Network dan Hostname..."
 echo "archlinux" > /etc/hostname
 
-# Menggunakan <<EOT untuk menulis ke /etc/hosts (Spasi dibersihkan)
+# Menggunakan <<EOT untuk menulis ke /etc/hosts (Spasi dibersihkan total)
 cat <<EOT > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
@@ -34,7 +43,6 @@ echo "--> [Chroot] Mengonfigurasi bootloader (systemd-boot)..."
 bootctl install
 
 echo "--> [Chroot] Menghapus mkinitcpio untuk standarisasi Dracut..."
-# Sesuai rekomendasi dokumentasi Arch saat migrasi penuh ke Dracut
 pacman -Rns --noconfirm mkinitcpio || true
 
 echo "--> [Chroot] Membuat initramfs dengan Dracut khusus Zen Kernel..."
