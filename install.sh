@@ -50,14 +50,6 @@ echo "--> Mengonfigurasi PGP Key dan repositori ALHP v4 pada Live ISO..."
 pacman-key --init
 pacman-key --populate archlinux
 
-echo "--> Mengunduh kunci ALHP langsung dari repositori resmi..."
-# Mengunduh file kunci publik ALHP langsung tanpa lewat keyserver
-curl -sS https://pages.alhp.dev/alhp.asc -o /tmp/alhp.asc
-
-# Memasukkan kunci yang diunduh ke dalam keyring pacman
-pacman-key --add /tmp/alhp.asc
-pacman-key --lsign-key F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
-
 echo "--> Mengonfigurasi repositori ALHP v4 (Bypass Key Check)..."
 # Menambahkan repositori ALHP dengan aturan SigLevel = Optional TrustAll
 # Ini membuat pacman mengabaikan error PGP key khusus untuk repo ALHP selama instalasi
