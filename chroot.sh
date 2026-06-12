@@ -25,7 +25,6 @@ echo "LANG=en_US.UTF-8" > /etc/locale.conf
 echo "--> [Chroot] Mengatur Network dan Hostname..."
 echo "archlinux" > /etc/hostname
 
-# Menggunakan <<EOT untuk menulis ke /etc/hosts (Spasi dibersihkan total)
 cat <<EOT > /etc/hosts
 127.0.0.1   localhost
 ::1         localhost
@@ -46,10 +45,8 @@ ZEN_VER=$(ls /usr/lib/modules | grep zen)
 dracut --kver "$ZEN_VER" --force /boot/initramfs-linux-zen.img
 dracut --kver "$ZEN_VER" --force --add-drivers "rescue" /boot/initramfs-linux-zen-fallback.img
 
-# Mendapatkan UUID Root secara otomatis
 UUID_ROOT=$(blkid -s UUID -o value /dev/nvme0n1p2)
 
-# Menggunakan <<EOT untuk menulis loader.conf
 cat <<EOT > /boot/loader/loader.conf
 default arch.conf
 timeout 3
@@ -57,7 +54,6 @@ console-mode max
 editor no
 EOT
 
-# Menggunakan <<EOT untuk menulis entri boot utama
 cat <<EOT > /boot/loader/entries/arch.conf
 title Arch Linux (Zen-v4)
 linux /vmlinuz-linux-zen
@@ -66,7 +62,6 @@ initrd /initramfs-linux-zen.img
 options root=UUID=$UUID_ROOT rw rootflags=subvol=@ quiet
 EOT
 
-# Menggunakan <<EOT untuk menulis entri boot fallback
 cat <<EOT > /boot/loader/entries/arch-fallback.conf
 title Arch Linux (Zen-v4 Fallback)
 linux /vmlinuz-linux-zen
