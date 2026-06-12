@@ -2,7 +2,6 @@
 set -e
 
 echo "--> [Chroot] Mengonfigurasi ALHP v4 secara permanen..."
-# Menggunakan penambahan di akhir file pacman.conf agar jauh lebih aman dari risiko duplikasi terstruktur
 cat <<EOT >> /etc/pacman.conf
 
 [core-x86-64-v4]
@@ -41,9 +40,6 @@ systemctl enable NetworkManager
 
 echo "--> [Chroot] Mengonfigurasi bootloader (systemd-boot)..."
 bootctl install
-
-echo "--> [Chroot] Menghapus mkinitcpio untuk standarisasi Dracut..."
-pacman -Rns --noconfirm mkinitcpio || true
 
 echo "--> [Chroot] Membuat initramfs dengan Dracut khusus Zen Kernel..."
 ZEN_VER=$(ls /usr/lib/modules | grep zen)
