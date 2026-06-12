@@ -5,10 +5,20 @@ echo "===================================================="
 echo "   Arch Linux x86_64-v4 + Zen Kernel Installer      "
 echo "===================================================="
 
+# Cek koneksi internet sebelum mulai agar tidak macet di tengah jalan
+echo "--> Memeriksa koneksi internet..."
+if ! ping -c 2 google.com &>/dev/null; then
+    echo "ERROR: Tidak ada koneksi internet. Sambungkan internet terlebih dahulu!"
+    exit 1
+fi
+
 echo "--> Membuat tabel partisi GPT dan partisi baru pada /dev/nvme0n1..."
 sgdisk --zap-all /dev/nvme0n1
 sgdisk --new=1:0:+2G --typecode=1:ef00 --change-name=1:ESP /dev/nvme0n1
 sgdisk --new=2:0:0 --typecode=2:8300 --change-name=2:ArchLinux /dev/nvme0n1
+
+# Menunggu kernel me-refresh tabel partisi baru
+sleep 2 
 
 echo "--> Memformat partisi (FAT32 & Btrfs)..."
 mkfs.fat -F32 -n ESP /dev/nvme0n1p1
@@ -36,9 +46,20 @@ mount -o noatime,compress=zstd,subvol=@log /dev/nvme0n1p2 /mnt/var/log
 mount /dev/nvme0n1p1 /mnt/boot
 
 echo "--> Mengonfigurasi PGP Key dan repositori ALHP v4 pada Live ISO..."
-pacman-key --recv-keys F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
+# 1. Inisialisasi gpg bawaan ISO agar siap menerima key baru
+pacman-key --init
+pacman-key --populate archlinux
+
+# 2. Menggunakan keyserver Ubuntu (hkps://keyserver.ubuntu.com) yang jauh lebih stabil
+echo "--> Mengambil kunci ALHP dari keyserver Ubuntu..."
+pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
 pacman-key --lsign-key F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
+
+# 3. Menambahkan repositori ALHP ke pacman.conf milik Live ISO
 sed -i '/^\[core\]/i [core-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
+
+# 4. Sinkronisasi database database pacman setelah repositori ditambahkan
+pacman -Sy --noconfirm
 
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
 reflector --country Indonesia --protocol https --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
