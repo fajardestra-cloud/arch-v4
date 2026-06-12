@@ -44,16 +44,11 @@ mount -o noatime,compress=zstd,subvol=@log /dev/nvme0n1p2 /mnt/var/log
 mount /dev/nvme0n1p1 /mnt/boot
 
 echo "--> Mengonfigurasi repositori ALHP v4 secara menyeluruh..."
-# 1. Mengubah SigLevel global pada pacman.conf Live ISO agar mengizinkan TrustAll database kustom
+cp /etc/pacman.conf.pacnew /etc/pacman.conf 2>/dev/null || true
 sed -i 's/^SigLevel    = Required DatabaseOptional/SigLevel = Optional TrustAll/' /etc/pacman.conf
-
-# 2. Menambahkan repositori ALHP v4 ke pacman.conf
 sed -i '/^\[core\]/i [core-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
 
-# Bersihkan cache database pacman yang korup/ditolak sebelumnya
 rm -rf /var/lib/pacman/sync/*
-
-# Sinkronisasi ulang database pacman
 pacman -Sy --noconfirm
 
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
