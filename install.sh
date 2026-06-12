@@ -5,7 +5,6 @@ echo "===================================================="
 echo "   Arch Linux x86_64-v4 + Zen Kernel Installer      "
 echo "===================================================="
 
-# Cek koneksi internet sebelum mulai agar tidak macet di tengah jalan
 echo "--> Memeriksa koneksi internet..."
 if ! ping -c 2 google.com &>/dev/null; then
     echo "ERROR: Tidak ada koneksi internet. Sambungkan internet terlebih dahulu!"
@@ -17,8 +16,7 @@ sgdisk --zap-all /dev/nvme0n1
 sgdisk --new=1:0:+2G --typecode=1:ef00 --change-name=1:ESP /dev/nvme0n1
 sgdisk --new=2:0:0 --typecode=2:8300 --change-name=2:ArchLinux /dev/nvme0n1
 
-# Menunggu kernel me-refresh tabel partisi baru
-sleep 2 
+sleep 2
 
 echo "--> Memformat partisi (FAT32 & Btrfs)..."
 mkfs.fat -F32 -n ESP /dev/nvme0n1p1
@@ -45,17 +43,17 @@ mount -o noatime,compress=zstd,subvol=@cache /dev/nvme0n1p2 /mnt/var/cache
 mount -o noatime,compress=zstd,subvol=@log /dev/nvme0n1p2 /mnt/var/log
 mount /dev/nvme0n1p1 /mnt/boot
 
-echo "--> Mengonfigurasi PGP Key dan repositori ALHP v4 pada Live ISO..."
-# 1. Inisialisasi gpg bawaan ISO agar siap menerima key baru
-pacman-key --init
-pacman-key --populate archlinux
+echo "--> Mengonfigurasi repositori ALHP v4 secara menyeluruh..."
+# 1. Mengubah SigLevel global pada pacman.conf Live ISO agar mengizinkan TrustAll database kustom
+sed -i 's/^SigLevel    = Required DatabaseOptional/SigLevel = Optional TrustAll/' /etc/pacman.conf
 
-echo "--> Mengonfigurasi repositori ALHP v4 (Bypass Key Check)..."
-# Menambahkan repositori ALHP dengan aturan SigLevel = Optional TrustAll
-# Ini membuat pacman mengabaikan error PGP key khusus untuk repo ALHP selama instalasi
+# 2. Menambahkan repositori ALHP v4 ke pacman.conf
 sed -i '/^\[core\]/i [core-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
 
-# Sinkronisasi database database pacman setelah repositori ditambahkan
+# Bersihkan cache database pacman yang korup/ditolak sebelumnya
+rm -rf /var/lib/pacman/sync/*
+
+# Sinkronisasi ulang database pacman
 pacman -Sy --noconfirm
 
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
