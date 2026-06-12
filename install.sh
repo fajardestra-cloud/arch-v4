@@ -50,9 +50,12 @@ echo "--> Mengonfigurasi PGP Key dan repositori ALHP v4 pada Live ISO..."
 pacman-key --init
 pacman-key --populate archlinux
 
-# 2. Menggunakan keyserver Ubuntu (hkps://keyserver.ubuntu.com) yang jauh lebih stabil
-echo "--> Mengambil kunci ALHP dari keyserver Ubuntu..."
-pacman-key --keyserver hkps://keyserver.ubuntu.com --recv-keys F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
+echo "--> Mengunduh kunci ALHP langsung dari repositori resmi..."
+# Mengunduh file kunci publik ALHP langsung tanpa lewat keyserver
+curl -sS https://pages.alhp.dev/alhp.asc -o /tmp/alhp.asc
+
+# Memasukkan kunci yang diunduh ke dalam keyring pacman
+pacman-key --add /tmp/alhp.asc
 pacman-key --lsign-key F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
 
 # 3. Menambahkan repositori ALHP ke pacman.conf milik Live ISO
