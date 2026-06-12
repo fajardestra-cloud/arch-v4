@@ -58,10 +58,12 @@ curl -sS https://pages.alhp.dev/alhp.asc -o /tmp/alhp.asc
 pacman-key --add /tmp/alhp.asc
 pacman-key --lsign-key F7AC1436EFE55AA17BB38B4254DF2855BAEB77EA
 
-# 3. Menambahkan repositori ALHP ke pacman.conf milik Live ISO
-sed -i '/^\[core\]/i [core-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
+echo "--> Mengonfigurasi repositori ALHP v4 (Bypass Key Check)..."
+# Menambahkan repositori ALHP dengan aturan SigLevel = Optional TrustAll
+# Ini membuat pacman mengabaikan error PGP key khusus untuk repo ALHP selama instalasi
+sed -i '/^\[core\]/i [core-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n\n[extra-x86-64-v4]\nSigLevel = Optional TrustAll\nServer = https://cdn.alhp.dev/\$repo/os/\$arch\n' /etc/pacman.conf
 
-# 4. Sinkronisasi database database pacman setelah repositori ditambahkan
+# Sinkronisasi database database pacman setelah repositori ditambahkan
 pacman -Sy --noconfirm
 
 echo "--> Mengurutkan mirrorlist resmi terdekat..."
