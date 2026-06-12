@@ -65,7 +65,6 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # 9. Mengunduh Skrip Chroot ke Dalam Sistem Baru
 echo "--> Mempersiapkan lingkungan chroot..."
-# PENTING: GANTI 'USERNAME_ANDA' DAN 'arch-v4' SESUAI AKUN GITHUB ANDA SEKARANG
 curl -L -o /mnt/chroot.sh https://raw.githubusercontent.com/fajardestra-cloud/arch-v4/main/chroot.sh
 chmod +x /mnt/chroot.sh
 
